@@ -1,0 +1,207 @@
+<template>
+  <!-- MOBILE -->
+
+  <div class="min-[990px]:hidden h-max w-screen flex justify-center pb-[5rem]">
+    <div
+      id="gymFlooringContainerMOB"
+      class="h-max w-[96vw] text-center py-[4vh] flex flex-col gap-[1vh] font-outfit font-[400] bg-gradient-to-br from-detailsFrom to-detailsTo rounded-md shadow-lg bg-opacity-[.6] px-[3vw]"
+    >
+      <div class="h-max w-full flex justify-between text-[1.6rem] z-[9]">
+        <!-- MOBILE -->
+        <span class="text-left text-balance gym_Flooring_Details_Mob-HEADING"
+          >Choose your Flooring</span
+        >
+        <button
+          @click="clearMaterialSelections"
+          v-show="userStore.preference.spec_3"
+          class="h-max bg-white text-gray-500 px-[1.2vw] py-[.8vh] text-detailsContainer_clearAllText_MOB rounded-md flex gap-[1vw] items-center"
+        >
+          Clear All <Icon icon="material-symbols:cancel-outline-rounded" />
+        </button>
+      </div>
+      <div class="h-max w-full flex justify-between gap-[2vw] z-[9]">
+        <!-- MOBILE -->
+        <!-- Rubber -->
+        <div
+          :class="[
+            'h-[7.2rem]  gym_Flooring_Details_Mob-CONTAINER  w-full rounded-md overflow-hidden  border-[2px] border-[#f1f1f1]  w flex items-end justify-between text-[#f1f1f1] px-[1.6vw] py-[.8vh] text-[1.2rem] relative cursor-pointer',
+            { selected: userStore.preference.spec_3 === 'Rubber' },
+          ]"
+          @click="toggleSelect('Rubber')"
+        >
+          <div
+            v-show="userStore.preference.spec_3 === 'Rubber'"
+            class="selectedDiv h-full w-full from-[20%] absolute bottom-0 left-0 bg-opacity-[.3] z-[1] flex items-start justify-end px-[1vw] py-[1vh]"
+          >
+            <!-- Selected indicator without text -->
+            <span
+              class="absolute top-1 right-1 bg-white text-gray-500 px-2 py-1 text-[1.8vh] rounded-md"
+              >Selected</span
+            >
+          </div>
+          <div
+            class="h-full w-full bg-gradient-to-b from-[#0000] to-black from-[60%] absolute bottom-0 left-0 bg-opacity-[.3] z-[-1]"
+          ></div>
+          <NuxtImg
+            quality="50"
+            placeholder
+            loading="lazy"
+            class="h-full w-full object-cover absolute left-0 bottom-0 z-[-9]"
+            src="/gym/rubberFlooring.webp"
+            alt="#"
+          />
+          <span>Rubber</span>
+        </div>
+        <!-- MOBILE -->
+        <!-- PVC -->
+        <div
+          :class="[
+            'h-[7.2rem]  gym_Flooring_Details_Mob-CONTAINER  w-full rounded-md overflow-hidden  border-[2px] border-[#f1f1f1]  w flex items-end justify-between text-[#f1f1f1] px-[1.6vw] py-[.8vh] text-[1.2rem] relative cursor-pointer',
+            { selected: userStore.preference.spec_3 === 'PVC' },
+          ]"
+          @click="toggleSelect('PVC')"
+        >
+          <div
+            v-show="userStore.preference.spec_3 === 'PVC'"
+            class="selectedDiv h-full w-full from-[20%] absolute bottom-0 left-0 bg-opacity-[.3] z-[1] flex items-start justify-end px-[1vw] py-[1vh]"
+          >
+            <!-- Selected indicator without text -->
+            <span
+              class="absolute top-1 right-1 bg-white text-gray-500 px-2 py-1 text-[1.8vh] rounded-md"
+              >Selected</span
+            >
+          </div>
+          <div
+            class="h-full w-full bg-gradient-to-b from-[#0000] to-black from-[60%] absolute bottom-0 left-0 bg-opacity-[.3] z-[-1]"
+          ></div>
+          <NuxtImg
+            placeholder
+            loading="lazy"
+            class="h-full w-full object-cover absolute left-0 bottom-0 z-[-9]"
+            src="/gym/pvcGymFlooring.webp"
+            alt="#"
+          />
+          <span>PVC</span>
+        </div>
+      </div>
+      <div class="h-max w-full flex justify-between gap-[2vw] z-[9]">
+        <!-- MOBILE -->
+        <!-- Wooden -->
+        <div
+          :class="[
+            'h-[7.2rem]  gym_Flooring_Details_Mob-CONTAINER  w-full rounded-md overflow-hidden  border-[2px] border-[#f1f1f1]  w flex items-end justify-between text-[#f1f1f1] px-[1.6vw] py-[.8vh] text-[1.2rem] relative cursor-pointer',
+            { selected: userStore.preference.spec_3 === 'Wooden' },
+          ]"
+          @click="toggleSelect('Wooden')"
+        >
+          <div
+            v-show="userStore.preference.spec_3 === 'Wooden'"
+            class="selectedDiv h-full w-full from-[20%] absolute bottom-0 left-0 bg-opacity-[.3] z-[1] flex items-start justify-end px-[1vw] py-[1vh]"
+          >
+            <!-- Selected indicator without text -->
+            <span
+              class="absolute top-1 right-1 bg-white text-gray-500 px-2 py-1 text-[1.8vh] rounded-md"
+              >Selected</span
+            >
+          </div>
+          <div
+            class="h-full w-full bg-gradient-to-b from-[#0000] to-black from-[60%] absolute bottom-0 left-0 bg-opacity-[.3] z-[-1]"
+          ></div>
+          <NuxtImg
+            quality="50"
+            placeholder
+            loading="lazy"
+            class="h-full w-full object-cover absolute left-0 bottom-0 z-[-9]"
+            src="/gym/woodenGymFlooring.webp"
+            alt="#"
+          />
+          <span>Wooden</span>
+        </div>
+        <!-- MOBILE -->
+        <!-- Artificial Grass -->
+        <div
+          v-show="!(userStore.preference.spec_1 === 'Strength')"
+          :class="[
+            'h-[7.2rem]  gym_Flooring_Details_Mob-CONTAINER  w-full rounded-md overflow-hidden  border-[2px] border-[#f1f1f1]  w flex items-end justify-between text-[#f1f1f1] px-[1.6vw] py-[.8vh] text-[1.2rem] relative cursor-pointer',
+            {
+              selected: userStore.preference.spec_3 === 'Artificial Grass',
+            },
+          ]"
+          @click="toggleSelect('Artificial Grass')"
+        >
+          <div
+            v-show="userStore.preference.spec_3 === 'Artificial Grass'"
+            class="selectedDiv h-full w-full from-[20%] absolute bottom-0 left-0 bg-opacity-[.3] z-[1] flex items-start justify-end px-[1vw] py-[1vh]"
+          >
+            <!-- Selected indicator without text -->
+            <span
+              class="absolute top-1 right-1 bg-white text-gray-500 px-2 py-1 text-[1.8vh] rounded-md"
+              >Selected</span
+            >
+          </div>
+          <div
+            class="h-full w-full bg-gradient-to-b from-[#0000] to-black from-[60%] absolute bottom-0 left-0 bg-opacity-[.3] z-[-1]"
+          ></div>
+          <NuxtImg
+            quality="50"
+            placeholder
+            loading="lazy"
+            class="h-full w-full object-cover absolute left-0 bottom-0 z-[-9]"
+            src="/40004.jpg"
+            alt="#"
+          />
+          <!-- MOBILE -->
+          <span>Artificial Grass</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+// PINIA
+const { existingUser } = defineProps(["existingUser"]);
+
+import { Icon } from "@iconify/vue/dist/iconify.js";
+import { ref } from "vue";
+import useUserStore from "~/stores/user";
+import { useRouter } from "vue-router";
+import {
+  DISABLE_SCROLL,
+  ENABLE_SCROLL,
+} from "./../../../../../utils/reusables";
+
+const userStore = useUserStore();
+const router = useRouter();
+
+const spec_3 = ref("");
+const isLoading = ref(false);
+
+function clearMaterialSelections() {
+  spec_3.value = "";
+  userStore.preference.spec_3 = "";
+}
+
+function toggleSelect(material) {
+  if (!material) return;
+
+  isLoading.value = true;
+  DISABLE_SCROLL();
+  setTimeout(() => {
+    isLoading.value = false;
+    ENABLE_SCROLL();
+    router.push({
+      path: "/flooring/catalog?type=gym",
+      query: { gym: material },
+    });
+  }, 1000);
+}
+</script>
+
+<style scoped>
+.selected {
+  border-radius: 0px; /* Adjust this value as needed */
+  border-radius: 0.375rem;
+  border: 2px solid #333; /* Adjust border color as needed */
+}
+</style>

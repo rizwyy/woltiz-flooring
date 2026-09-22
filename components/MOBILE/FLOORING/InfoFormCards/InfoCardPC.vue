@@ -1,0 +1,482 @@
+<template>
+  <!--INPUT ERROR OVERLAY -->
+  <transition @beforeEnter="handleDetailsDOMEntry('InfoCardPC')">
+    <div
+      id="infoCardContainerPC"
+      v-show="
+        ((userStore.preference.flooring === 'services' ||
+          userStore.preference.flooring === 'accessories') &&
+          userStore.preference.orderMethod !== '') ||
+        (userStore.preference.flooring === `${flooring}` &&
+          userStore.preference.spec_1 !== '' &&
+          userStore.preference.color.length > 0 &&
+          userStore.preference.budget !== '' &&
+          userStore.preference.orderMethod !== '')
+      "
+      class="max-[990px]:hidden h-max w-screen flex justify-center pb-[4vh]"
+    >
+      <div
+        class="iptErrMsg_Carpets opacity-0 invisible h-max py-[2.4vh] px-[2vw] left-[50%] translate-x-[-50%] top-[2.4vh] rounded-md w-[72vw] flex justify-center items-center fixed gap-[2vw] bottom-0 bg-[#000] bg-opacity-[.7] backdrop-blur-[8px] z-[999]"
+      >
+        <span
+          class="text-white font-[500] tracking-[.2vw] uppercase text-center text-detailsContainer_heading_PC"
+          >Please fill out all fields correctly before proceeding</span
+        >
+      </div>
+      <div class="h-max w-screen flex justify-center">
+        <div
+          class="h-max w-[88%] flex flex-col gap-[4vh] bg-[#f1f1f1] py-[12vh] rounded-md items-center"
+        >
+          <div
+            class="h-max w-[84%] flex flex-col gap-[5.8vh] overflow-hidden px-[2.8vw] pt-[4.2vh] rounded-md shadow-xl relative bg-gradient-to-br from-detailsFrom to-detailsTo"
+          >
+            <div class="h-max w-max flex flex-col gap-[.4vh] items-start">
+              <span
+                class="InfoCardPC-HEADING opacity-0 translate-y-[20%] w-max text-[2.4rem] font-[400] text-[#444]"
+                >Your Contact Information</span
+              >
+              <span
+                class="InfoCardPC-HEADING opacity-0 translate-y-[20%] text-[#999] text-[1.2rem] font-[450]"
+                >Enter your contact information</span
+              >
+              <span
+                v-show="isNameInvalid || isMailInvalid || isPhoneInvalid"
+                class="text-red-400 text-[2rem] font-[450]"
+                >Something went wrong!</span
+              >
+            </div>
+
+            <div
+              class="invisible opacity-0 InfoCardPC-CONTAINER h-full w-full absolute top-0 left-0 flex items-center justify-center bg-[#fff1] backdrop-blur-[8px] z-[1]"
+            >
+              <LoadingIcon />
+            </div>
+            <div
+              class="checkout_Overlay h-full w-full absolute top-0 left-0 bg-[#fff4] backdrop-blur-[.2px] z-[-1]"
+            ></div>
+            <div class="h-max w-full flex flex-col gap-[1vh]">
+              <span class="text-[1.1vw] font-[500] text-[#333]"
+                >Name (required)</span
+              >
+              <input
+                :class="{
+                  'bg-gray-300': userStore.isFormValidated && cookieFound,
+                  'bg-white': !(userStore.isFormValidated && cookieFound),
+                  'border-red-500 focus:border-red-300': isNameInvalid,
+                  'border-[#555] focus:border-black': !isNameInvalid,
+                }"
+                :readonly="userStore.isFormValidated && cookieFound"
+                class="border-[2px] InfoCardPC-CONTAINER opacity-0 translate-y-[20%] rounded-md px-[1.2vw] border-[#555] bg-[#fff9] py-[2.4vh] outline-none focus:border-black"
+                placeholder="Name"
+                v-model="nameIpt"
+              />
+            </div>
+            <div class="h-max w-full flex justify-between items-center">
+              <div class="h-max w-[46%] flex flex-col gap-[1vh]">
+                <span class="text-[1.1vw] font-[500] text-[#333]"
+                  >Email Address (required)</span
+                >
+                <input
+                  :class="{
+                    'bg-gray-300': userStore.isFormValidated && cookieFound,
+                    'bg-white': !(userStore.isFormValidated && cookieFound),
+                    'border-red-500 focus:border-red-300': isNameInvalid,
+                    'border-[#555] focus:border-black': !isNameInvalid,
+                  }"
+                  :readonly="userStore.isFormValidated && cookieFound"
+                  :required="mailIpt.length > 8"
+                  type="email"
+                  class="border-[2px] InfoCardPC-CONTAINER opacity-0 translate-y-[20%] rounded-md px-[1.2vw] border-[#555] py-[2.4vh] outline-none focus:border-black"
+                  placeholder="Mail"
+                  v-model="mailIpt"
+                />
+              </div>
+              <div class="h-max w-[46%] flex flex-col gap-[1vh]">
+                <span class="text-[1.1vw] font-[500] text-[#333]"
+                  >Phone Number (required)</span
+                >
+                <div class="h-max w-full flex">
+                  <select
+                    :class="{
+                      'bg-gray-300': userStore.isFormValidated && cookieFound,
+                      'bg-white': !(userStore.isFormValidated && cookieFound),
+                      'border-red-500 focus:border-red-300': isNameInvalid,
+                      'border-[#555] focus:border-black': !isNameInvalid,
+                    }"
+                    v-model="userStore.preference.country"
+                    class="w-max rounded-l-md border-[2px] border-r-[0px] border-[#555] bg-[#fff9] py-[1.4vh] px-[.8vw] text-[2vh] outline-none InfoCardPC-CONTAINER opacity-0"
+                  >
+                    <option value="Bahrain">+973</option>
+                    <option value="UAE">+971</option>
+                    <option value="Saudi Arabia">+966</option>
+                    <option value="Kuwait">+965</option>
+                    <option value="Qatar">+974</option>
+                  </select>
+                  <input
+                    :readonly="userStore.isFormValidated && cookieFound"
+                    :class="{
+                      'bg-gray-300': userStore.isFormValidated && cookieFound,
+                      'bg-white': !(userStore.isFormValidated && cookieFound),
+                      'border-red-500 focus:border-red-300': isNameInvalid,
+                      'border-[#555] focus:border-black': !isNameInvalid,
+                    }"
+                    :required="phoneIpt.length > 8"
+                    type="number"
+                    class="[appearance:textfield] w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none border-[2px] InfoCardPC-CONTAINER opacity-0 translate-y-[20%] rounded-r-md px-[1.2vw] bg-[#fff9] py-[2.4vh] text-[2vh] outline-none"
+                    placeholder="Phone"
+                    v-model="phoneIpt"
+                  />
+                </div>
+              </div>
+            </div>
+            <div
+              class="h-max w-full flex gap-[4.8vw] py-[6.2vh] transition-all ease-in-out duration-300"
+            >
+              <button
+                @click="toggleReadOnly"
+                :class="[
+                  'flex justify-center items-center hover:shadow-lg hover:translate-y-[-2%] transition-all ease-in-out duration-[.4s] InfoCardPC-CONTAINER  border-[#666] active:scale-[.93] hover:translate-y-[2%]  transition-all ease-in-out duration-300  w-full border-[2.4px] tracking-[.2vw] rounded-md py-[2.4vh] uppercase font-[500] text-[1.6rem] px-[2vw] outline-none',
+                ]"
+              >
+                <span>EDIT</span>
+              </button>
+              <button
+                @click="handleInfoProceedings_PC"
+                :class="[
+                  'flex justify-center items-center hover:shadow-lg hover:translate-y-[-2%] transition-all ease-in-out duration-[.4s] InfoCardPC-CONTAINER  border-[#666] active:scale-[.93] hover:translate-y-[2%]  transition-all ease-in-out duration-300  w-full border-[2.4px] tracking-[.2vw] rounded-md py-[2.4vh] uppercase font-[500] text-[1.6rem] px-[2vw] outline-none',
+                ]"
+              >
+                <span v-show="!isLoading">PROCEED</span>
+                <Icon
+                  v-show="isLoading"
+                  class="text-[1.6rem] text-[#333]"
+                  icon="eos-icons:three-dots-loading"
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</template>
+
+<script setup>
+import LoadingIcon from "~/public/icons/loadingIcon.vue";
+import useUserStore from "../../../stores/user";
+
+import { ref } from "vue";
+import { Icon } from "@iconify/vue/dist/iconify.js";
+const userPreference = useCookie("userPreference");
+const { flooring } = defineProps(["flooring"]);
+
+const mailIpt = ref("");
+const nameIpt = ref("");
+const phoneIpt = ref("");
+
+const sanitizedPhone = ref(0);
+
+const isNameInvalid = ref(false);
+const isMailInvalid = ref(false);
+const isPhoneInvalid = ref(false);
+
+const isEditing = ref(false);
+const changesDetected = ref(false);
+const isPhoneChanged = ref(false);
+
+const cookieFound = ref(false);
+
+const isLoading = ref(false);
+const userStore = useUserStore();
+
+function toggleReadOnly() {
+  cookieFound.value = false;
+  isEditing.value = true;
+}
+
+function setUserPreferenceCookie() {
+  const obj = {
+    name: userStore.userData.name,
+    email: userStore.userData.email,
+    phone: userStore.userData.phone,
+    orderMethod: userStore.preference.orderMethod,
+  };
+  userPreference.value = obj;
+  console.log(obj);
+
+  console.log("COOKIE SET");
+  cookieFound.value = true;
+}
+
+const getSanitizedPhone = () => {
+  return userStore.userData.phone.startsWith("+")
+    ? userStore.userData.phone.slice(1)
+    : addCountryCode(
+        userStore.userData.phone,
+        userStore.preference.country
+      ).slice(1);
+};
+const insertLog = async (isOrderConfirmed) => {
+  try {
+    // Helper to get the sanitized phone number
+
+    // Helper to get the contact (either phone or email)
+    const getContact = () => {
+      const { phone, email } = userStore.userData;
+      return userStore.preference.orderMethod === "whatsapp" ||
+        userStore.preference.orderMethod === "email"
+        ? phone.startsWith("+")
+          ? phone
+          : addCountryCode(phone, userStore.preference.country)
+        : email;
+    };
+
+    sanitizedPhone.value = getSanitizedPhone();
+    const contact = getContact();
+    const name = userStore.userData.name;
+
+    // Validate name and contact
+    if (!name || !contact) {
+      console.error("Name and contact details are required.");
+      return;
+    }
+
+    // Build user data object
+    const userData = {
+      name,
+      phone: contact,
+      email: userStore.userData.email,
+      preference: userStore.preference,
+      isOrderConfirmed,
+    };
+
+    // Check for duplicates only if isEditing.value is true
+    if (isEditing.value) {
+      const preferences = await fetchPreferencesByMobile(sanitizedPhone.value);
+
+      if (preferences && Array.isArray(preferences.data)) {
+        const preferencesArray = preferences.data;
+
+        // Check if any preferences match the current userStore preferences
+        const isDuplicate = preferencesArray.some((log) => {
+          const pref = log.preference;
+          return (
+            pref.flooring === userStore.preference.flooring &&
+            pref.spec_1 === userStore.preference.spec_1 &&
+            pref.spec_2 === userStore.preference.spec_2 &&
+            pref.spec_3 === userStore.preference.spec_3 &&
+            JSON.stringify(pref.color) ===
+              JSON.stringify(userStore.preference.color) && // Compare arrays
+            pref.budget === userStore.preference.budget
+          );
+        });
+        if (isDuplicate) {
+          console.log("Duplicate preference found. No new log will be added.");
+          return; // Exit function without inserting a new log
+        }
+      }
+    }
+    // Proceed with setting the cookie and inserting the log
+    const { data: setCookieData, error: setCookieError } = await useFetch(
+      "/api/set-cookie"
+    );
+
+    if (setCookieError?.value) {
+      throw new Error("Error setting cookie: " + setCookieError.value);
+    }
+
+    // Insert the log
+    const response = await fetch("/api/insert-logs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(userData),
+    });
+
+    if (!response.ok) {
+      throw new Error("Error inserting logs");
+    }
+
+    const logData = await response.json();
+    const fetchedData = await fetchPreferencesByMobile(sanitizedPhone.value);
+    userStore.cart = [];
+    fetchedData.data.forEach((item) => {
+      if (item.preference && item.id) {
+        const cartItem = {
+          id: item.id,
+          ...item.preference, // Spread the preference object
+        };
+        userStore.cart.push(cartItem);
+      }
+    });
+    userStore.removePiniaObj();
+    userStore.refreshCart();
+    isEditing.value = true;
+  } catch (error) {
+    console.error("Error occurred:", error);
+  }
+};
+
+async function handleInfoProceedings_PC() {
+  const phoneWithCode = addCountryCode(
+    phoneIpt.value,
+    userStore.preference.country
+  );
+  const validationResults = validateInputs(
+    mailIpt.value,
+    `${phoneWithCode}`,
+    nameIpt.value
+  );
+  const isValid =
+    validationResults.isEmailValid &&
+    validationResults.isPhoneValid &&
+    validationResults.isNameValid;
+
+  if (!isValid) {
+    if (!validationResults.isEmailValid) {
+      // Handle invalid email
+      isMailInvalid.value = true;
+    }
+
+    if (!validationResults.isPhoneValid) {
+      isPhoneInvalid.value = true;
+      // Handle invalid phone
+    }
+
+    if (!validationResults.isNameValid) {
+      // Handle invalid name
+      isNameInvalid.value = true;
+    }
+    userStore.isFormValidated = false;
+    return;
+  }
+
+  if (!isValid) {
+    userStore.isFormValidated = false;
+    return;
+  } else {
+    isLoading.value = true;
+    isNameInvalid.value = false;
+    isPhoneInvalid.value = false;
+    isMailInvalid.value = false;
+
+    // Update user data in store
+    userStore.userData.name = nameIpt.value;
+    userStore.userData.email = mailIpt.value;
+    userStore.userData.phone = phoneWithCode;
+
+    setUserPreferenceCookie();
+    insertLog(false);
+    userStore.isFormValidated = true;
+
+    setTimeout(async () => {
+      isLoading.value = false;
+      userStore.updateCookie();
+      userStore.refreshCart();
+      scrollToEl("revCardContainerPC");
+
+      // Wait for 3 seconds, then call getHistoryFromServer
+      setTimeout(async () => {
+        await userStore.getHistoryFromServer(); // Await for history fetching
+      }, 1600); // 3 seconds delay
+    }, 800);
+  }
+}
+
+let initialValues = {
+  spec_1: userStore.preference.spec_1,
+  spec_2: userStore.preference.spec_2,
+  spec_3: userStore.preference.spec_3,
+  color: [...userStore.preference.color], // Copy of the array
+  budget: userStore.preference.budget,
+  phone: userStore.userData.phone, // Add phone here
+};
+
+// Watch for changes in phone
+watch(
+  () => userStore.userData.phone, // Watch the phone value in userStore
+  (newPhone, oldPhone) => {
+    // Add country code if missing
+    const newSanitizedPhone = newPhone.startsWith("+")
+      ? newPhone
+      : addCountryCode(newPhone, userStore.preference.country);
+
+    const oldSanitizedPhone = oldPhone.startsWith("+")
+      ? oldPhone
+      : addCountryCode(oldPhone, userStore.preference.country);
+
+    if (newSanitizedPhone !== oldSanitizedPhone) {
+      // console.log(
+      //   `Phone changed from ${oldSanitizedPhone} to ${newSanitizedPhone}`
+      // );
+      // setUserPreferenceCookie();
+      // Update the phone value in initialValues
+      initialValues.phone = newSanitizedPhone;
+    }
+  }
+);
+
+// Watch for `isEditing` to turn `true` and start monitoring changes
+watch(
+  () => isEditing.value,
+  (newValue) => {
+    if (newValue) {
+      // Watch for changes in preferences
+      watch(
+        [
+          () => userStore.preference.spec_1,
+          () => userStore.preference.spec_2,
+          () => userStore.preference.spec_3,
+          () => userStore.preference.color,
+          () => userStore.preference.budget,
+        ],
+        ([newSpec1, newSpec2, newSpec3, newColor, newBudget]) => {
+          // Compare current values with initial values
+          if (
+            newSpec1 !== initialValues.spec_1 ||
+            newSpec2 !== initialValues.spec_2 ||
+            newSpec3 !== initialValues.spec_3 ||
+            JSON.stringify(newColor) !== JSON.stringify(initialValues.color) ||
+            newBudget !== initialValues.budget
+          ) {
+            changesDetected.value = true;
+            userStore.isFormValidated = false;
+          }
+        },
+        { deep: true }
+      );
+    }
+  }
+);
+
+// Watch the cart's length
+let reloadTimeout;
+
+watch(
+  () => userStore.cart.length, // Watch the length of the cart
+  (newLength) => {
+    // Clear any previously set timeout to prevent multiple reloads
+    clearTimeout(reloadTimeout);
+
+    if (newLength === 0) {
+      // Set a timeout to reload after 2 seconds
+      reloadTimeout = setTimeout(() => {
+        window.location.reload();
+      }, 2000); // 2000ms = 2 seconds
+    }
+  }
+);
+
+onMounted(() => {
+  if (userPreference.value && typeof userPreference.value === "object") {
+    const { name = "", phone = "", email = "" } = toRaw(userPreference.value);
+
+    userStore.userData.name = nameIpt.value = name || "";
+    userStore.userData.phone = phoneIpt.value = phone ? phone.substring(4) : "";
+    userStore.userData.email = mailIpt.value = email || "";
+
+    if (userStore.userData.name) {
+      cookieFound.value = true;
+    }
+  }
+});
+</script>

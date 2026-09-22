@@ -1,0 +1,127 @@
+<script setup>
+import useUserStore from "~/stores/user";
+const userStore = useUserStore();
+
+import NavBarPC from "~/components/DESKTOP/NavBarPC.vue";
+import NavBarMOB from "~/components/MOBILE/NavBarMOB.vue";
+import FloatingBarMOB from "~/components/MOBILE/FLOORING/FloatingBarMOB.vue";
+import CurrencyDetails from "~/components/MOBILE/FLOORING/CountryDetails.vue";
+
+// Eager-loaded component (for both mobile and desktop)
+import GymFlooringDetails from "../../../components/MOBILE/FLOORING/GYM/GymFlooringDetails.vue";
+import ScrollToTopBTNPC from "~/components/DESKTOP/ScrollToTopBTN-PC.vue";
+
+// Lazy-loaded components
+const LazyGymActivitiesDetails = defineAsyncComponent(() =>
+  import("../../../components/MOBILE/FLOORING/GYM/GymActivitiesDetails.vue")
+);
+const LazyGymApplicationDetails = defineAsyncComponent(() =>
+  import("~/components/MOBILE/FLOORING/GYM/GymApplicationDetails.vue")
+);
+const LazyGymColorDetails = defineAsyncComponent(() =>
+  import("~/components/MOBILE/FLOORING/GYM/GymColorDetails.vue")
+);
+const LazyGymBudgetDetails = defineAsyncComponent(() =>
+  import("~/components/MOBILE/FLOORING/GYM/GymBudgetDetails.vue")
+);
+const LazyOrderMethod = defineAsyncComponent(() =>
+  import("../../../components/MOBILE/FLOORING/OrderMethod.vue")
+);
+const LazyInfoForm = defineAsyncComponent(() =>
+  import("../../../components/MOBILE/FLOORING/InfoForm.vue")
+);
+const LazyReviewCard = defineAsyncComponent(() =>
+  import("../../../components/MOBILE/FLOORING/DetailsReview.vue")
+);
+
+const isMobile = ref(false);
+const existingUser = ref(false);
+
+onMounted(() => {
+  userStore.preference.flooring = "gym";
+
+  // const userPreferenceCookie = useCookie("userPreference").value;
+  // existingUser.value = !!userPreferenceCookie?.name;
+  isMobile.value = window.innerWidth < 990;
+});
+</script>
+
+<template>
+  <!-- DESKTOP -->
+  <section v-if="!isMobile" class="max-[990px]:hidden max-w-screen h-max">
+    <NavBarPC />
+    <ScrollToTopBTNPC />
+
+    <div
+      class="h-max max-w-[100vw] overflow-x-hidden font-outfit flex flex-col gap-[1rem] flex flex-col gap-[6vh] items-center"
+    >
+      <div
+        class="h-max px-[6vw] pt-[4vh] pb-[0vh] w-full flex flex-col items-start text-[1.9rem] gap-[1rem]"
+      >
+        <!-- DESKTOP -->
+        <a
+          href="/flooring"
+          class="text-detailsContainer_colorLabel_PC underline underline-offset-[.4vh] text-[#666] flex"
+        >
+          Gym Flooring >
+          <!-- DESKTOP -->
+          {{ userStore.preference.spec_2 }}
+        </a>
+        <span class="text-gridContainer_heading_PC"> Specify Your Needs </span>
+      </div>
+      <!-- DESKTOP -->
+      <GymFlooringDetails />
+      <!-- <LazyGymApplicationDetails /> -->
+      <!-- <LazyGymActivitiesDetails /> -->
+      <!-- <LazyGymColorDetails /> -->
+      <!-- <LazyGymBudgetDetails /> -->
+      <!-- <LazyOrderMethod flooring="gym" />
+      <LazyInfoForm flooring="gym" />
+      <LazyReviewCard flooring="gym" link="gym" /> -->
+    </div>
+    <!-- DESKTOP -->
+  </section>
+  <!-- -------------------------------------------- -->
+  <!-- MOBILE -->
+  <section v-else class="min-[990px]:hidden w-max h-max">
+    <NavBarMOB />
+    <FloatingBarMOB flooring="GYM FLOORS" link="/" />
+    <div
+      class="h-max w-screen font-outfit flex flex-col gap-[.5rem] flex flex-col gap-[.5rem] items-center z-[2]"
+    >
+      <div
+        class="h-max px-[4vw] pt-[.7rem] pb-[.2rem] w-full flex flex-col items-start text-[1.9rem] gap-[1rem]"
+      >
+        <!-- MOBILE -->
+        <div class="h-max w-full flex justify-between">
+          <a
+            href="/flooring"
+            class="text-[2.4vh] underline underline-offset-[.8vh] text-[#666] flex"
+          >
+            Gym Flooring
+          </a>
+          <CurrencyDetails />
+        </div>
+        <span class="text-[1.9rem]"> Specify Your Needs </span>
+      </div>
+      <BannerYouWin />
+      <GymFlooringDetails />
+      <!-- <LazyGymActivitiesDetails :existingUser="existingUser" />
+      <LazyGymActivitiesDetails :existingUser="existingUser" />
+      <LazyGymColorDetails :existingUser="existingUser" />
+      <LazyGymBudgetDetails :existingUser="existingUser" />
+      <LazyOrderMethod flooring="gym" />
+      <LazyInfoForm flooring="gym" />
+      <LazyReviewCard flooring="gym" link="gym" /> -->
+    </div>
+    <!-- MOBILE -->
+  </section>
+</template>
+
+<style scoped>
+.font-outfit {
+  font-family: "Outfit", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+</style>

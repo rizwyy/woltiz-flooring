@@ -1,0 +1,67 @@
+<script setup>
+const { name, color, price, currency, src } = defineProps([
+  "name",
+  "color",
+  "price",
+  "currency",
+  "src",
+]);
+
+const route = useRoute();
+
+onMounted(() => {
+  handleCatalogDOMEntry("catalogItem_MOB");
+});
+</script>
+
+<template>
+  <div
+    class="catalogItem_MOB opacity-0 translate-y-[20%] h-max w-[46vw] flex flex-col items-center"
+  >
+    <div
+      class="ImgContainer h-[24vh] w-full overflow-hidden bg-gray-200 overflow-hidden"
+    >
+      <img
+        loading="lazy"
+        class="object-cover h-full w-full"
+        :src="
+          color
+            ? `https://iqhciavbeulhroqoskbu.supabase.co/storage/v1/object/public/images_carpets/${color}`
+            : `/carpets/${getColorAfterHyphen(color)}.webp`
+        "
+        :alt="color"
+      />
+    </div>
+    <div
+      class="detailsContainer h-max w-full flex flex-col gap-[.4vh] items-start pt-[.8vh] pl-[1vw]"
+    >
+      <div class="h-max w-full flex items-center justify-between">
+        <span class="inline-block text-[2.4vh] text-[#111]">{{
+          name.toUpperCase()
+        }}</span>
+      </div>
+      <!-- <span
+        class="inline-block flex justify-start text-[1rem] w-[100%] text-left text-balance text-[#999]"
+        >{{ getColorAfterHyphen(color) }}</span
+      > -->
+      <div class="h-max w-max flex flex-col gap-[0vh]">
+        <div class="text-[#999] w-max flex justify-between gap-[1.2vw]">
+          <span class="flex-1 text-[2vh]"> From </span>
+          <span
+            class="font-[500] flex-grow flex items-center text-[#111] text-[2vh]"
+            >{{ currency }}{{ price }}</span
+          >
+        </div>
+      </div>
+      <div class="h-max w-full pt-[.8vh]">
+        <button
+          class="h-max w-full rounded-sm border-[1px] py-[.4vh] text-[2vh] border-[#444]"
+        >
+          VIEW DETAILS
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped></style>

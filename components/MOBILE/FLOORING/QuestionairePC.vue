@@ -1,0 +1,602 @@
+<template>
+  <div
+    @click.self="closeForm"
+    class="h-[110vh] w-screen max-w-[100vw] pb-[10vh] fixed top-0 left-0 flex flex-col items-center justify-center bg-[#000] bg-opacity-[.3] backdrop-blur-[8px] z-[999999] font-outfit"
+  >
+    <div
+      class="h-[36rem] bg-[#ededed] w-[60%] relative rounded-lg flex flex-col overflow-hidden"
+    >
+      <div
+        :style="{ width: `${progressBarWidth}%` }"
+        :class="`h-[.5rem]  transition-all ease-in-out duration-300 bg-blue-200 rounded-r-lg`"
+      ></div>
+      <!-- NAV -->
+      <div v-auto-animate class="h-full w-full flex flex-col">
+        <div
+          :class="`h-max w-full bg-[#ededed] flex ${
+            currentQuestion > 1 ? 'justify-between' : 'justify-end'
+          } pt-[1rem] px-[2vw]`"
+        >
+          <button
+            v-show="currentQuestion > 1"
+            @click="currentQuestion === 1 ? closeForm() : decrementQuestion()"
+            class="px-[2vw] py-[.4rem] active:scale-[.9] transition-all duration-100 font-[500] font-[500] text-[1.2rem] underline underline-offset-[.2rem] text-[#444]"
+          >
+            Back
+          </button>
+          <div class="h-max w-max flex items-center gap-[4vw]">
+            <button
+              @click="handleQuestionaireConfirmation"
+              v-if="currentQuestion === questionnaireList.length"
+              class="h-max w-max flex items-center bg-[#333] px-[3.2vw] justify-center gap-[.2vw] py-[.6rem] rounded-md"
+            >
+              <span class="text-[#f1f1f1]">Done</span>
+              <Icon
+                class="text-[1.2rem] text-[#f1f1f1]"
+                :icon="
+                  !isLoading
+                    ? 'material-symbols-light:play-arrow-rounded'
+                    : 'eos-icons:three-dots-loading'
+                "
+              />
+            </button>
+
+            <button
+              v-else
+              @click="incrementQuestion"
+              class="h-max w-max active:scale-[.9] transition-all duration-100 flex items-center bg-[#333] px-[3.2vw] justify-center gap-[.2vw] py-[.6rem] rounded-md"
+            >
+              <span class="text-[#f1f1f1]">Next</span>
+              <Icon
+                class="text-[1.2rem] text-[#f1f1f1]"
+                icon="material-symbols-light:play-arrow-rounded"
+              />
+            </button>
+          </div>
+        </div>
+
+        <!-- QUESTIONS -->
+        <div
+          v-if="currentQuestion === 1"
+          class="bg-[#ededed] h-full w-full flex flex-col gap-[2rem] items-center justify-between"
+        >
+          <QuestionaireCard :item="questionnaireList[0]" class="flex-[2]" />
+          <div
+            class="h-full w-full flex-[3] grid grid-cols-2 pb-[4rem] gap-[2vw] px-[4vw]"
+          >
+            <div
+              v-for="(country, index) in countriesWithIcons"
+              :key="index"
+              @click="toggleCountrySelection(country.name)"
+              :class="`h-[5.4rem]  border-[2px] transition-all ease-in-out ${
+                selectedCountry === country.name
+                  ? ' bg-[#d9d9d9] border-[#333]'
+                  : ' bg-inherit border-[#999]'
+              } w-full rounded-md flex items-center justify-center relative cursor-pointer`"
+            >
+              <span>{{ country.name }}</span>
+              <Icon
+                class="absolute top-[.2rem] right-[.5vw] text-[1.4rem] text-[#444]"
+                :icon="
+                  selectedCountry === country.name
+                    ? 'material-symbols:check-box-outline-rounded'
+                    : 'material-symbols:check-box-outline-blank'
+                "
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          class="bg-[#ededed] h-max w-full flex flex-col gap-[3rem]"
+          v-else-if="currentQuestion === 2"
+        >
+          <QuestionaireCard :item="questionnaireList[1]" class="flex-[2]" />
+          <div
+            class="h-full w-full flex-[3] grid grid-cols-3 justify-items-stretch gap-[3vw] px-[4vw]"
+          >
+            <div
+              v-for="(flooring, index) in flooringProducts"
+              :key="index"
+              @click="toggleFlooringSelection(flooring.name)"
+              :class="`h-[3.4rem]  border-[2px] transition-all ease-in-out ${
+                selectedFloorings.includes(flooring.name)
+                  ? ' bg-[#d9d9d9] border-[#333]'
+                  : ' bg-inherit border-[#999]'
+              } w-full rounded-md flex items-center justify-start pl-[1vw] relative cursor-pointer`"
+            >
+              <span>{{ flooring.name }}</span>
+              <Icon
+                class="absolute top-[.2rem] right-[.5vw] text-[1.4rem] text-[#444]"
+                :icon="
+                  selectedFloorings.includes(flooring.name)
+                    ? 'material-symbols:check-box-outline-rounded'
+                    : 'material-symbols:check-box-outline-blank'
+                "
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          class="h-max w-full flex flex-col gap-[3rem]"
+          v-else-if="currentQuestion === 3"
+        >
+          <QuestionaireCard :item="questionnaireList[2]" />
+          <div
+            class="h-full w-full flex-[3] grid grid-cols-2 justify-items-stretch gap-[2vw] px-[4vw]"
+          >
+            <div
+              v-for="(service, index) in flooringServices"
+              :key="index"
+              @click="toggleServiceSelection(service)"
+              :class="`h-[5rem]  border-[2px] transition-all ease-in-out ${
+                selectedServices.includes(service)
+                  ? ' bg-[#d9d9d9] border-[#333]'
+                  : ' bg-inherit border-[#999]'
+              } w-full rounded-md flex items-center justify-start pl-[1.4vw] relative cursor-pointer`"
+            >
+              <span class="text-[1.2rem]">{{ service }}</span>
+              <Icon
+                class="absolute top-[.2rem] right-[.5vw] text-[1.4rem] text-[#444]"
+                :icon="
+                  selectedServices.includes(service)
+                    ? 'material-symbols:check-box-outline-rounded'
+                    : 'material-symbols:check-box-outline-blank'
+                "
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          v-else-if="currentQuestion === 4"
+          class="h-max w-full flex flex-col gap-[2rem]"
+        >
+          <QuestionaireCard :item="questionnaireList[3]" />
+          <div
+            class="h-full w-full flex-[3] flex flex-col justify-items-stretch gap-[1.2rem] px-[4vw]"
+          >
+            <div
+              v-for="(pos, index) in floorManagerOptions"
+              :key="index"
+              @click="toggleUserPosition(pos)"
+              :class="`h-[5.4rem]  border-[2px] transition-all ease-in-out ${
+                userPosition === pos
+                  ? ' bg-[#d9d9d9] border-[#333]'
+                  : ' bg-inherit border-[#999]'
+              } w-full rounded-md flex items-center justify-start pl-[4vw] relative cursor-pointer`"
+            >
+              <span class="text-[1.2rem]">{{ pos }}</span>
+              <Icon
+                class="absolute top-[.2rem] right-[.5vw] text-[1.4rem] text-[#444]"
+                :icon="
+                  userPosition === pos
+                    ? 'material-symbols:check-box-outline-rounded'
+                    : 'material-symbols:check-box-outline-blank'
+                "
+              />
+            </div>
+          </div>
+        </div>
+        <!-- && if the HomeOwner is selected -->
+        <div
+          v-else-if="currentQuestion === 5"
+          class="h-max w-full flex flex-col gap-[2rem]"
+        >
+          <QuestionaireCard :item="questionnaireList[4]" />
+          <div
+            class="h-full w-full flex-[3] flex flex-col justify-items-stretch gap-[.8rem] px-[4vw]"
+          >
+            <div
+              v-for="(status, index) in projectStatusOptions"
+              :key="index"
+              @click="toggleProjectStatus(status)"
+              :class="`h-[5rem] border-[2px] transition-all ease-in-out ${
+                projectStatus === status
+                  ? ' bg-[#d9d9d9] border-[#333]'
+                  : ' bg-inherit border-[#999]'
+              } w-full rounded-md flex items-center justify-start pl-[4vw] relative cursor-pointer`"
+            >
+              <span class="text-[1.2rem]">{{ status }}</span>
+              <Icon
+                class="absolute top-[.2rem] right-[.5vw] text-[1.4rem] text-[#444]"
+                :icon="
+                  projectStatus === status
+                    ? 'material-symbols:check-box-outline-rounded'
+                    : 'material-symbols:check-box-outline-blank'
+                "
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          v-else-if="currentQuestion === 6"
+          class="h-max w-full flex flex-col gap-[2rem]"
+        >
+          <QuestionaireCard :item="questionnaireList[5]" />
+          <div
+            class="h-full w-full flex-[3] flex flex-col justify-items-stretch gap-[1.4rem] px-[4vw]"
+          >
+            <div
+              v-for="(frame, index) in timeFrameOptions"
+              :key="index"
+              @click="toggleTimeFrame(frame)"
+              :class="`h-[3.8rem] border-[2px] transition-all ease-in-out ${
+                timeFrame === frame
+                  ? ' bg-[#d9d9d9] border-[#333]'
+                  : ' bg-inherit border-[#999]'
+              } w-full rounded-md flex items-center justify-start pl-[2vw] relative cursor-pointer`"
+            >
+              <span class="text-[1.1rem]">{{ frame }}</span>
+              <Icon
+                class="absolute top-[.2rem] right-[.5vw] text-[1.4rem] text-[#444]"
+                :icon="
+                  timeFrame === frame
+                    ? 'material-symbols:check-box-outline-rounded'
+                    : 'material-symbols:check-box-outline-blank'
+                "
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          v-else-if="
+            currentQuestion === 7 ||
+            (currentQuestion === 6 && userPosition === 'Homeowner')
+          "
+          class="h-max w-full flex flex-col gap-[3rem]"
+        >
+          <QuestionaireCard :item="questionnaireList[6]" />
+          <div
+            class="h-full w-full flex flex-col items-start gap-[1.8rem] justify-center flex-[3] px-[4vw]"
+          >
+            <textarea
+              v-model="addressIpt"
+              placeholder="Your address here"
+              class="h-[7rem] rounded-md bg-inherit px-[1vw] text-[1rem] py-[.8rem] w-[100%] border-[2px] border-[#777]"
+            />
+            <div class="h-max w-full px-[2vw] py-[2rem] flex justify-end">
+              <button
+                @click="incrementQuestion"
+                class="text-[1.2rem] font-[500] flex items-center underline underline-offset-[.4rem]"
+              >
+                Submit<Icon
+                  class="text-[1.8rem] text-[#333]"
+                  icon="material-symbols-light:play-arrow-rounded"
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+        <div v-else class="h-max w-full flex flex-col gap-[2rem] pt-[1rem]">
+          <QuestionaireCard :item="questionnaireList[7]" />
+          <div
+            class="h-full w-full flex flex-col gap-[1.8rem] items-center justify-center flex-[3] px-[4vw]"
+          >
+            <input
+              type="username"
+              v-model="nameIpt"
+              placeholder="Name"
+              class="h-[3.2rem] rounded-md bg-inherit px-[1vw] text-[1rem] py-[.8rem] w-[100%] border-[2px] border-[#777]"
+            />
+            <input
+              type="email"
+              v-model="mailIpt"
+              placeholder="Email"
+              class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none h-[3.2rem] rounded-md bg-inherit px-[1vw] text-[1rem] py-[.8rem] w-[100%] border-[2px] border-[#777]"
+            />
+            <input
+              type="number"
+              v-model="phoneIpt"
+              placeholder="Phone"
+              class="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none h-[3.2rem] rounded-md bg-inherit px-[1vw] text-[1rem] py-[.8rem] w-[100%] border-[2px] border-[#777]"
+            />
+            <div class="h-max w-full px-[2vw] flex justify-end pt-[2rem]">
+              <button
+                @click="handleQuestionaireConfirmation"
+                class="text-[1.2rem] font-[500] flex items-center underline underline-offset-[.4rem]"
+              >
+                Submit & Finish<Icon
+                  class="text-[1.8rem] text-[#333]"
+                  :icon="
+                    !isLoading
+                      ? 'material-symbols-light:play-arrow-rounded'
+                      : 'eos-icons:three-dots-loading'
+                  "
+                />
+              </button>
+            </div>
+            <div
+              class="h-max w-full flex justify-center text-[#999] text-[.8rem] px-[4vw] text-center"
+            >
+              <!-- <span>
+                All rights reserved. <u>Terms and Conditions</u> and
+                <u>Privacy Policy</u> | Cookie Preferences Do Not Sell My
+                Information</span
+              > -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ANSWERS -->
+</template>
+
+<script setup>
+import { Icon } from "@iconify/vue/dist/iconify.js";
+import QuestionaireCard from "./QuestionaireCard.vue";
+import { ref, computed } from "vue";
+import useUserStore from "~/stores/user";
+
+const router = useRouter();
+
+const userStore = useUserStore();
+
+const currentQuestion = ref(1);
+const selectedCountry = ref("");
+const selectedFloorings = ref([]);
+const selectedServices = ref([]);
+const userPosition = ref("");
+const projectStatus = ref("");
+const timeFrame = ref("");
+const addressIpt = ref("");
+const nameIpt = ref("");
+const phoneIpt = ref("");
+const mailIpt = ref("");
+const isLoading = ref(false);
+const showError = ref(false); // Add showError ref
+
+const questionnaireList = [
+  {
+    question: "Which country are you located in?",
+    description:
+      "Please select your country to help us provide accurate services.",
+  },
+  {
+    question: "Which flooring product are you interested in?",
+    description: "Choose from options like Carpets, Gym, Rubber, or Epoxy.",
+  },
+  {
+    question: "What type of flooring service do you require?",
+    description:
+      "Are you looking for installation, maintenance, or material supply?",
+  },
+  {
+    question: "Are you a homeowner or a contractor?",
+    description:
+      "Please let us know who will be managing the flooring project.",
+  },
+  {
+    question: "Do you have a tender or job in hand?",
+    description:
+      "Let us know if this project is already confirmed or still in the bidding phase.",
+  },
+  {
+    question: "What is the time frame for the project?",
+    description: "Please indicate the expected start and completion date.",
+  },
+  {
+    question: "What is the address for the flooring project?",
+    description: "Provide the site address where the work will take place.",
+  },
+  {
+    question: "Please share your contact details.",
+    description: "Enter your phone number so we can reach you.",
+  },
+];
+
+const emit = defineEmits(["close", "success"]);
+const closeForm = () => {
+  emit("close");
+};
+
+// Data
+const countriesWithIcons = [
+  { name: "Bahrain" },
+  { name: "Qatar" },
+  { name: "Kuwait" },
+  { name: "Saudi Arabia" },
+  { name: "UAE" },
+  { name: "Oman" },
+];
+
+const flooringProducts = [
+  { name: "Carpet" },
+  { name: "Parquet" },
+  { name: "Vinyl" },
+  { name: "Raised" },
+  { name: "Rubber" },
+  { name: "Grass" },
+  { name: "Epoxy" },
+  { name: "Stone" },
+];
+
+const flooringServices = [
+  "Installation",
+  "Maintenance",
+  "Material Supply",
+  "Consultation",
+  "Repair",
+];
+const floorManagerOptions = ["Homeowner", "Contractor"];
+const projectStatusOptions = ["Tender", "Job in Hand"];
+const timeFrameOptions = [
+  "Immediate",
+  "1-3 Months",
+  "3-6 Months",
+  "More than 6 Months",
+];
+
+// Progress bar width
+const progressBarWidth = computed(() => {
+  return (
+    (currentQuestion.value - 1) *
+    (98 / (questionnaireList.length - 1))
+  ).toFixed(2);
+});
+
+// Toggle Functions
+const toggleCountrySelection = (countryName) => {
+  selectedCountry.value = countryName;
+};
+
+const toggleUserPosition = (pos) => {
+  userPosition.value = pos;
+};
+
+const toggleTimeFrame = (frame) => {
+  timeFrame.value = frame;
+};
+
+const toggleProjectStatus = (project) => {
+  projectStatus.value = project;
+};
+const flooringLinks = {
+  Carpet: "flooring/carpets/details",
+  Parquet: "flooring/parquets/details",
+  Vinyl: "flooring/pvc/details",
+  Raised: "flooring/raised/details",
+  Rubber: "flooring/rubber/details",
+  Grass: "flooring/grass/details",
+  Epoxy: "flooring/epoxy/details",
+  Stone: "flooring/stone/details",
+};
+const tempStr = useCookie("tempStr");
+
+const toggleFlooringSelection = (flooring) => {
+  if (userStore.tempString === "RS") {
+    tempStr.value = "RS";
+    router.push(`/${flooringLinks[flooring]}`);
+  }
+
+  if (selectedFloorings.value.includes(flooring)) {
+    selectedFloorings.value = selectedFloorings.value.filter(
+      (item) => item !== flooring
+    );
+  } else {
+    selectedFloorings.value.push(flooring);
+  }
+};
+
+const toggleServiceSelection = (service) => {
+  if (selectedServices.value.includes(service)) {
+    selectedServices.value = selectedServices.value.filter(
+      (item) => item !== service
+    );
+  } else {
+    selectedServices.value.push(service);
+  }
+};
+
+// Validation logic for each question
+const validateCurrentQuestion = () => {
+  switch (currentQuestion.value) {
+    case 1:
+      return selectedCountry.value !== ""; // Ensure a country is selected
+    case 2:
+      return selectedFloorings.value.length > 0; // At least one flooring product selected
+    case 3:
+      return selectedServices.value.length > 0; // At least one service selected
+    case 4:
+      return userPosition.value !== ""; // User position must be selected
+    case 5:
+      return projectStatus.value !== ""; // Project status must be selected
+    case 6:
+      return timeFrame.value !== ""; // Time frame must be selected
+    case 7:
+      return addressIpt.value.length > 9; // Address must not be empty
+    case 8:
+      return nameIpt.value.length > 4 && phoneIpt.value.length > 5; // Name and phone must not be empty
+    default:
+      return true;
+  }
+};
+
+// Navigation between questions
+const incrementQuestion = () => {
+  if (
+    validateCurrentQuestion() &&
+    currentQuestion.value < questionnaireList.length
+  ) {
+    // Skip address question if tempString is not 'HV' or 'RS'
+    if (
+      currentQuestion.value === 6 &&
+      (userStore.tempString === "SV" || userStore.tempString === "CE")
+    ) {
+      showError.value = false;
+      currentQuestion.value += 2; // Skip address question
+      return;
+    }
+
+    // Existing condition to skip another question for Homeowners
+    if (userPosition.value === "Homeowner" && currentQuestion.value === 4) {
+      showError.value = false;
+      currentQuestion.value += 2;
+      return;
+    }
+
+    showError.value = false; // Hide error when validation passes
+    currentQuestion.value++;
+  } else {
+    showError.value = true; // Show error when validation fails
+  }
+};
+const decrementQuestion = () => {
+  if (currentQuestion.value > 1) {
+    currentQuestion.value--;
+    showError.value = false; // Hide error on moving back
+  }
+};
+
+// Confirmation
+const handleQuestionaireConfirmation = async () => {
+  const phoneWithCode = addCountryCode(phoneIpt.value, selectedCountry.value);
+
+  const validationResult = validateInputs(
+    mailIpt.value.length > 0 ? mailIpt.value : "nomail@gmail.com",
+    phoneWithCode,
+    nameIpt.value
+  );
+  if (
+    validationResult.isPhoneValid &&
+    validationResult.isNameValid &&
+    validationResult.isEmailValid
+  ) {
+    isLoading.value = true;
+    const formData = {
+      country: selectedCountry.value,
+      floorings: selectedFloorings.value,
+      services: selectedServices.value,
+      position: userPosition.value,
+      projectStatus: projectStatus.value,
+      timeFrame: timeFrame.value,
+      address: addressIpt.value,
+    };
+
+    try {
+      const response = await $fetch("/api/insert-quote", {
+        method: "POST",
+        body: {
+          name: nameIpt.value,
+          phone: phoneIpt.value,
+          mail: mailIpt.value,
+          formData,
+        },
+      });
+
+      console.log("Quote submission response:", response);
+      emit("success", response.id); // Emit success event with the inserted ID
+    } catch (error) {
+      console.error("Error submitting quote:", error);
+      showError.value = true;
+      closeForm();
+    } finally {
+      isLoading.value = false;
+      closeForm();
+    }
+  } else {
+    showError.value = true; // Show error when validation fails
+  }
+};
+</script>
+
+<style lang="scss" scoped></style>

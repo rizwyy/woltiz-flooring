@@ -1,0 +1,87 @@
+<template>
+  <DesignerFormMOB @close="handleCloseForm" v-if="isFormActive" />
+  <section
+    class="designerCardMOB opacity-0 translate-y-[6%] w-[90vw] mx-auto mt-[1rem] overflow-hidden rounded-lg shadow-md px-[5vw] pt-[1.6rem] pb-[1.2rem] text-center font-outfit flex items-center flex-col gap-[2.8rem]"
+  >
+    <div
+      class="apnaBannerItem_Overlay backdrop-blur-[8px] absolute top-0 left-0 h-full w-full transition-all duration-[.4s] ease-in-out bg-gradient-to-b hover:to-[70%] to-transparent z-[-1]"
+    ></div>
+    <div class="z-[-999] bg-blue-100 absolute top-0 left-0 h-full w-full"></div>
+
+    <NuxtImg
+      src="/bannerImage.png"
+      placeholder="/BannerImagePH.webp"
+      decoding="async"
+      alt="#"
+      @load="handleImageLoad(0, 'apnaBannerIMG_PC', 'apnaBannerItem')"
+      loading="lazy"
+      class="apnaBannerIMG h-full w-full z-[-9] absolute top-0 left-0 object-cover"
+    />
+
+    <!-- First line -->
+    <div
+      class="apnaBannerItem_Text opacity-0 text-[#555] text-[2rem] tracking-[-.3vw]"
+    >
+      Floorsir
+      <span class="text-[#222] font-[400] tracking-[0vw] text-[1.8rem]"
+        >For Designers</span
+      >
+    </div>
+
+    <!-- Second line -->
+    <h2
+      class="apnaBannerItem_Text opacity-0 text-[#333] text-[1.4rem] font-[400] pb-[1rem]"
+    >
+      Unlock Designer Discounts!
+    </h2>
+
+    <!-- Fifth line -->
+    <div class="h-max w-full flex justify-end">
+      <p
+        class="apnaBannerItem_Text opacity-0 w-[72%] text-[#888] text-[1rem] font-[400]"
+      >
+        Are you a Designer? Unlock Exclusive Discounts Here!
+      </p>
+    </div>
+
+    <!-- Button (Sign Up) -->
+    <div
+      class="h-max w-full flex flex-col justify-end items-end gap-[2rem] pt-[1rem] pr-[1vw] pb-[.5rem]"
+    >
+      <a
+        target="_blank"
+        href="https://wa.me/97333008801"
+        class="apnaBannerItem_Text opacity-0 border-[1.1px] border-[#999] text-[#444] active:shadow-xl w-[50%] py-[.9rem] shadow-md rounded-full transition-colors duration-300 text-[1rem] font-[500] flex items-center justify-center gap-[.4rem]"
+      >
+        <Icon icon="mdi:whatsapp" class="text-[1.4rem]" />Whatsapp
+      </a>
+    </div>
+  </section>
+</template>
+
+<script setup>
+import DesignerFormMOB from "./DesignerFormMOB.vue";
+import { Icon } from "@iconify/vue/dist/iconify.js";
+
+const isFormActive = ref(false);
+
+// Function to handle the 'close' event emitted by the child component
+function handleCloseForm() {
+  isFormActive.value = false; // Close the form by setting this to false
+  ENABLE_SCROLL();
+}
+const bringForm = () => {
+  isFormActive.value = true;
+  DISABLE_SCROLL();
+};
+
+onMounted(() => {
+  if (process.client) {
+    handleScrollTrigger("designerCardMOB");
+  }
+});
+</script>
+
+<style scoped>
+/* Any additional styles if needed */
+</style>
