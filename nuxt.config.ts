@@ -54,16 +54,6 @@ export default defineNuxtConfig({
   supabase: {
     redirect: false,
   },
-  runtimeConfig: {
-    SUPABASE_URL: process.env.SUPABASE_URL,
-    SUPABASE_KEY: process.env.SUPABASE_KEY,
-    SERVICE_KEY: process.env.SERVICE_KEY,
-    SUPABASE_JWKS_URL: process.env.SUPABASE_JWKS_URL,
-    public: {
-      twilioAccountSid: process.env.TWILIO_ACCOUNT_SID,
-      twilioAuthToken: process.env.TWILIO_AUTH_TOKEN,
-    },
-  },
   image: {
     domains: ["iqhciavbeulhroqoskbu.supabase.co"],
   },

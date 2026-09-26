@@ -11,6 +11,8 @@ dist/
 .data
 .nuxt
 .nitro
+.netlify
+.firecrawl
 .cache
 dist
 # 

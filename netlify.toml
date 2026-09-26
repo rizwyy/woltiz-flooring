@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22.14.0"
+  # These values are intentionally public and are embedded by the Supabase
+  # browser client. Keep the service-role credential scannable.
+  SECRETS_SCAN_OMIT_KEYS = "SUPABASE_URL,SUPABASE_KEY"
